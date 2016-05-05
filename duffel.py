@@ -17,7 +17,7 @@ _ACDCLI = '/home/verve/anaconda3/bin/acdcli'
 
 @app.route('/')
 def duffout():
-    return "Duffel stores stuff you use."
+    return "Duffel is your friendly neighborhood data broker."
 
 @app.route('/<resource>/<path:identifier>')
 def forward(resource, identifier):
