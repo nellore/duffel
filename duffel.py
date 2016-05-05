@@ -35,6 +35,7 @@ def forward(resource, identifier):
         Return value: Flask redirect response object
     """
     if resource == 'recount':
+        return "hello"
         try:
             # Redirect to temp URL obtained from ACD CLI
             return redirect(
