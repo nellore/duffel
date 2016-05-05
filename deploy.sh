@@ -22,8 +22,7 @@ sed -i "s^AddHandler wsgi-script .py^AddHandler wsgi-script .py\n    RewriteEngi
 sed -i "s/htdocs/$APPNAME/g" $HOME/webapps/$APPNAME/apache2/conf/httpd.conf
 
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cp $DIR/duffel.py $HOME/webapps/$APPNAME/$APPNAME/__init__.py
+cp /home/verve/duffel/duffel.py $HOME/webapps/$APPNAME/$APPNAME/__init__.py
 
 # Step 3
 $HOME/webapps/$APPNAME/apache2/bin/restart
