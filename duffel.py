@@ -24,7 +24,7 @@ def duffout():
     return "Duffel stores stuff you use."
 
 @app.route('/<resource>/<path:identifier>')
-def forward():
+def forward(resource, identifier):
     """ Redirects request for file to direct URL.
 
         Requires global "paths" dictionary is active. 
