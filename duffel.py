@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+"""
+duffel.py
+
+Flask app for routing to Rail outputs on various hosts. Currently supports only
+Amazon Cloud Drive. Requires https://github.com/yadayada/acd_cli is authorized
+and set up as owner of shared directory.
+"""
+from flask import Flask, redirect
+from contextlib import closing
+import subprocess
+import json
+app = Flask(__name__)
+
+# Path to ACD CLI is hardcoded so app works on Webfaction
+_ACDCLI = '/home/verve/anaconda3/bin/acdcli'
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.route('/<resource>/<path:identifier>')
+def forward():
+    """ Redirects request for file to direct URL.
+
+        Requires global "paths" dictionary is active. 
+
+        resource: a given resource, like "recount2"
+        identifier: relative path to file or directory
+
+        Return value: Flask redirect response object
+    """
+    if resource == 'recount':
+        try:
+            # Redirect to temp URL obtained from ACD CLI
+            return redirect(
+                        json.loads(
+                            subprocess.check_output(
+                                [
+                                    _ACDCLI,
+                                    'metadata',
+                                    '/'.join([resource, identifier])
+                            ]
+                        )
+                    )['tempLink']
+                )
+        except:
+            # 404 out below
+            pass
+    abort('404')
+
+if __name__ == '__main__':
+    app.run()
