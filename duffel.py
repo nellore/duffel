@@ -15,10 +15,6 @@ app = Flask(__name__)
 # Path to ACD CLI is hardcoded so app works on Webfaction
 _ACDCLI = '/home/verve/anaconda3/bin/acdcli'
 
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
-
 @app.route('/')
 def duffout():
     return "Duffel stores stuff you use."
@@ -49,7 +45,6 @@ def forward(resource, identifier):
                     )['tempLink']
                 )
         except Exception as e:
-            return e.__str__()
             # 404 out below
             pass
     abort('404')
