@@ -49,6 +49,7 @@ def forward(resource, identifier):
                     )['tempLink']
                 )
         except Exception as e:
+            return e.__str__
             # 404 out below
             pass
     abort('404')
