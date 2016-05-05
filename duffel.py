@@ -19,6 +19,10 @@ _ACDCLI = '/home/verve/anaconda3/bin/acdcli'
 def page_not_found(e):
     return render_template('404.html'), 404
 
+@app.route('/')
+def duffout():
+    return "Duffel stores stuff you use."
+
 @app.route('/<resource>/<path:identifier>')
 def forward():
     """ Redirects request for file to direct URL.

@@ -23,6 +23,7 @@ sed -i "s/htdocs/$APPNAME/g" $HOME/webapps/$APPNAME/apache2/conf/httpd.conf
 
 
 cp /home/verve/duffel/duffel.py $HOME/webapps/$APPNAME/$APPNAME/__init__.py
+cp /home/verve/duffel/404.html $HOME/webapps/$APPNAME/$APPNAME/404.html
 
 # Step 3
 $HOME/webapps/$APPNAME/apache2/bin/restart
