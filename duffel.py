@@ -50,7 +50,7 @@ def forward(resource, identifier):
                 )
         except Exception as e:
             # 404 out below
-            pass
+            abort(404)
     abort(404)
 
 if __name__ == '__main__':
