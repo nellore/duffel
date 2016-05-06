@@ -7,6 +7,7 @@ Amazon Cloud Drive. Requires https://github.com/yadayada/acd_cli is authorized
 and set up as owner of shared directory.
 """
 from flask import Flask, redirect, render_template, abort, request, Response
+from werkzeug import Headers
 from contextlib import closing
 import subprocess
 import json
@@ -15,6 +16,8 @@ app = Flask(__name__)
 
 # Path to ACD CLI is hardcoded so app works on Webfaction
 _ACDCLI = '/home/verve/anaconda3/bin/acdcli'
+# For local tests
+# _ACDCLI = 'acdcli'
 
 @app.route('/')
 def duffout():
@@ -52,9 +55,17 @@ def forward(resource, identifier):
                         templink,
                         headers={'range' : 'bytes=0-0'}
                     )
+                headers_to_return = Headers(aws_response.headers.items())
+                headers_to_return.set(
+                        'Content-Length',
+                        headers_to_return.get(
+                                'content-range'
+                            ).rpartition('/')[-1]
+                    )
+                headers_to_return.remove('Content-Range')
                 return Response(
-                        headers=aws_response.headers,
-                        status=aws_response.status_code,
+                        headers=headers_to_return,
+                        status=200,
                         content_type=aws_response.headers['content-type']
                     )
             # Redirect to temp URL obtained from ACD CLI
