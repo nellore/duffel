@@ -19,6 +19,7 @@ _ACDCLI = '/home/verve/anaconda3/bin/acdcli'
 def before_request():
     if request.method == 'HEAD':
         request.method = 'GET'
+        return 'hello'
 
 @app.route('/')
 def duffout():
