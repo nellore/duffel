@@ -59,9 +59,6 @@ def forward(resource, identifier):
                     )
             # Redirect to temp URL obtained from ACD CLI
             return redirect(templink)
-        except Exception as e:
-            # 404 out below
-            pass
     abort(404)
 
 if __name__ == '__main__':
