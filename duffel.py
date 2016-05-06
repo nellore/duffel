@@ -62,6 +62,10 @@ def forward(resource, identifier):
                                 'content-range'
                             ).rpartition('/')[-1]
                     )
+                headers_to_return.set(
+                        'Server',
+                        'Amazon-Cloud-Drive'
+                    )
                 headers_to_return.remove('Content-Range')
                 return Response(
                         headers=headers_to_return,
