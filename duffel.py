@@ -15,6 +15,11 @@ app = Flask(__name__)
 # Path to ACD CLI is hardcoded so app works on Webfaction
 _ACDCLI = '/home/verve/anaconda3/bin/acdcli'
 
+@app.before_request
+def before_request():
+    if method == 'HEAD':
+        request.environ['REQUEST_METHOD'] = request.method = 'GET'
+
 @app.route('/')
 def duffout():
     return "Duffel is your friendly neighborhood data broker."
