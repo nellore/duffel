@@ -6,7 +6,7 @@ Flask app for routing to Rail outputs on various hosts. Currently supports only
 Amazon Cloud Drive. Requires https://github.com/yadayada/acd_cli is authorized
 and set up as owner of shared directory.
 """
-from flask import Flask, redirect, render_template, abort
+from flask import Flask, redirect, render_template, abort, request
 from contextlib import closing
 import subprocess
 import json
