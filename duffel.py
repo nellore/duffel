@@ -50,7 +50,6 @@ def forward(resource, identifier):
             # 404 out below
             pass
         else:
-            print >>sys.stderr, request.headers.__str__()
             if request.method == 'HEAD':
                 # Workaround: use GET and simulate header
                 aws_response = requests.get(
