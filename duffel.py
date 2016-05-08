@@ -12,12 +12,13 @@ from contextlib import closing
 import subprocess
 import json
 import requests
+import sys
 app = Flask(__name__)
 
 # Path to ACD CLI is hardcoded so app works on Webfaction
 _ACDCLI = '/home/verve/anaconda3/bin/acdcli'
 # For local tests
-# _ACDCLI = 'acdcli'
+_ACDCLI = 'acdcli'
 
 @app.route('/')
 def duffout():
@@ -49,6 +50,7 @@ def forward(resource, identifier):
             # 404 out below
             pass
         else:
+            print >>sys.stderr, request.headers.__str__()
             if request.method == 'HEAD':
                 # Workaround: use GET and simulate header
                 aws_response = requests.get(
@@ -56,21 +58,64 @@ def forward(resource, identifier):
                         headers={'range' : 'bytes=0-0'}
                     )
                 headers_to_return = Headers(aws_response.headers.items())
-                headers_to_return.set(
-                        'Content-Length',
-                        headers_to_return.get(
+                content_length = headers_to_return.get(
                                 'content-range'
                             ).rpartition('/')[-1]
-                    )
-                headers_to_return.remove('Content-Range')
+                headers_to_return.set('Content-Length', content_length)
+                try:
+                    content_range = request.headers['range'].replace(
+                                            '=', ' '
+                                        ).strip()
+                    if content_range.endswith('-'):
+                        content_range = ''.join(
+                                [content_range, content_length,
+                                    '/', content_length]
+                            )
+                    else:
+                        content_range = ''.join([content_range,
+                                                    '/', content_length])
+                    headers_to_return.set(
+                            'Content-Range',
+                            content_range
+                        )
+                    content_range_present = True
+                except KeyError:
+                    headers_to_return.remove('Content-Range')
+                    content_range_present = False
                 return Response(
                         headers=headers_to_return,
-                        status=200,
+                        status=(206 if content_range_present
+                                    else 200),
                         content_type=aws_response.headers['content-type']
                     )
+            '''Kent quirk: tack byterange at end of redirect URL and
+            the range will get preserved on next request by client'''
+            try:
+                byterange = request.headers[
+                                        'range'
+                                    ].rpartition('=')[-1].strip()
+            except KeyError:
+                # No range in header, so return redirect with no tackon
+                return redirect(templink, code=302)
+            if byterange.endswith('-'):
+                # Need content length to terminate byterange
+                aws_response = requests.get(
+                        templink,
+                        headers={'range' : 'bytes=0-0'}
+                    )
+                terminator = aws_response.headers[
+                                            'content-range'
+                                        ].rpartition('/')[-1]
+            else:
+                terminator = ''
             # Redirect to temp URL obtained from ACD CLI
-            return redirect(templink)
+            return redirect(';'.join([
+                                    templink,
+                                    'byterange={}'.format(
+                                            ''.join([byterange, terminator])
+                                        )
+                                ]), code=302)
     abort(404)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
