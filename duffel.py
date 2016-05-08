@@ -88,33 +88,7 @@ def forward(resource, identifier):
                                     else 200),
                         content_type=aws_response.headers['content-type']
                     )
-            '''Kent quirk: tack byterange at end of redirect URL and
-            the range will get preserved on next request by client'''
-            try:
-                byterange = request.headers[
-                                        'range'
-                                    ].rpartition('=')[-1].strip()
-            except KeyError:
-                # No range in header, so return redirect with no tackon
-                return redirect(templink, code=302)
-            if byterange.endswith('-'):
-                # Need content length to terminate byterange
-                aws_response = requests.get(
-                        templink,
-                        headers={'range' : 'bytes=0-0'}
-                    )
-                terminator = aws_response.headers[
-                                            'content-range'
-                                        ].rpartition('/')[-1]
-            else:
-                terminator = ''
-            # Redirect to temp URL obtained from ACD CLI
-            return redirect(';'.join([
-                                    templink,
-                                    'byterange={}'.format(
-                                            ''.join([byterange, terminator])
-                                        )
-                                ]), code=302)
+            return redirect(templink, code=302)
     abort(404)
 
 if __name__ == '__main__':
