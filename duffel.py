@@ -36,6 +36,12 @@ def forward(resource, identifier):
         Return value: Flask redirect response object
     """
     if resource == 'recount':
+        # Redirect to IDIES URL first
+        idies_url = '/'.join(['http://idies.jhu.edu/recount/data', identifier])
+        idies_response = requests.head(idies_url)
+        if idies_reponse.status_code == 200:
+            return redirect(idies_url, code=302)
+        # IDIES won't work; try Cloud Drive
         try:
             templink = json.loads(
                             subprocess.check_output(
