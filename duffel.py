@@ -39,7 +39,7 @@ def forward(resource, identifier):
         # Redirect to IDIES URL first
         idies_url = '/'.join(['http://idies.jhu.edu/recount/data', identifier])
         idies_response = requests.head(idies_url)
-        if idies_response.status_code == 302:
+        if idies_response.status_code == 200:
             return redirect(idies_url, code=302)
         # IDIES won't work; try Cloud Drive
         try:
