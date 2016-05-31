@@ -18,7 +18,7 @@ app = Flask(__name__)
 # Path to ACD CLI is hardcoded so app works on Webfaction
 _ACDCLI = '/home/verve/anaconda3/bin/acdcli'
 # For local tests
-_ACDCLI = 'acdcli'
+# _ACDCLI = 'acdcli'
 
 @app.route('/')
 def duffout():
@@ -39,7 +39,7 @@ def forward(resource, identifier):
         # Redirect to IDIES URL first
         idies_url = '/'.join(['http://idies.jhu.edu/recount/data', identifier])
         idies_response = requests.head(idies_url)
-        if idies_reponse.status_code == 200:
+        if idies_response.status_code == 302:
             return redirect(idies_url, code=302)
         # IDIES won't work; try Cloud Drive
         try:
