@@ -72,10 +72,11 @@ def forward(resource, identifier):
         Return value: Flask redirect response object
     """
     # Log all requests, even weird ones
+    ip = str(request.headers.get('X-Forwarded-For',
+                        request.remote_addr)).split(',')[0].strip()
     print >>_LOGSTREAM, '\t'.join(
         [time.strftime('%A, %b %d, %Y at %I:%M:%S %p %Z'),
-             str(mmh3.hash128(str(request.environ['REMOTE_ADDR'])
-                                + 'recountsalt')),
+             str(mmh3.hash128(ip + 'recountsalt')),
              resource,
              identifier])
     _LOGSTREAM.flush()
