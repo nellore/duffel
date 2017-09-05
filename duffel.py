@@ -41,8 +41,8 @@ try:
 except ValueError:
     # Starting from 0 here
     new_filename_number = 0
-_LOGFILE = os.path.join(_LOGDIR, 'recount_log.{}.tsv.gz'.format(
-        new_filename_number
+_LOGFILE = os.path.join(_LOGDIR, 'recount_log.{filename_number}.tsv.gz'.format(
+        filename_number=new_filename_number
     ))
 _LOGSTREAM = gzip.open(_LOGFILE, 'a')
 def close_log():
