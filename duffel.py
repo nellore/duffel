@@ -41,8 +41,10 @@ try:
 except ValueError:
     # Starting from 0 here
     new_filename_number = 0
-_LOGFILE = os.path.join(_LOGDIR, 'recount_log.{filename_number}.tsv.gz'.format(
-        filename_number=new_filename_number
+_LOGFILE = os.path.join(_LOGDIR,
+        'recount_log.{filename_number}.{rando}.tsv.gz'.format(
+        filename_number=new_filename_number,
+        rando='{rando}'.format(rando=random.random())[2:]
     ))
 _LOGSTREAM = gzip.open(_LOGFILE, 'a')
 def close_log():
@@ -71,7 +73,7 @@ def forward(resource, identifier):
     # Log all requests, even weird ones
     print >>_LOGSTREAM, '\t'.join(
         [time.strftime('%A, %b %d, %Y at %I:%M:%S %p %Z'),
-             str(mmh3.hash128(request.remote_addr + 'recountsalt')),
+             str(mmh3.hash128(str(request.remote_addr) + 'recountsalt')),
              resource,
              identifier])
     _LOGSTREAM.flush()
