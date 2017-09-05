@@ -74,7 +74,8 @@ def forward(resource, identifier):
     # Log all requests, even weird ones
     print >>_LOGSTREAM, '\t'.join(
         [time.strftime('%A, %b %d, %Y at %I:%M:%S %p %Z'),
-             str(mmh3.hash128(str(request.remote_addr) + 'recountsalt')),
+             str(mmh3.hash128(str(request.environ['REMOTE_ADDR'])
+                                + 'recountsalt')),
              resource,
              identifier])
     _LOGSTREAM.flush()
