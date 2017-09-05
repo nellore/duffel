@@ -13,12 +13,45 @@ import subprocess
 import json
 import requests
 import sys
+import md5
+import gzip
+import atexit
+import os
+import time
 app = Flask(__name__)
 
 # Path to ACD CLI is hardcoded so app works on Webfaction
 _ACDCLI = '/home/verve/anaconda3/bin/acdcli'
 # For local tests
 # _ACDCLI = 'acdcli'
+# Path to log file is hardcoded
+# DO NOT TRACK IPs/LOCATIONS; track only times
+# Always open new logfile when restarting
+_LOGDIR = '/home/verve'
+filename_numbers = []
+for filename_number in [filename.split('.')[1] for filename
+    in os.listdir(_LOGDIR) if 'recount_log' in filename]:
+    try:
+        filename_numbers.append(int(filename_number))
+    except ValueError:
+        # Not a recognized log file
+        pass
+try:
+    new_filename_number = max(filename_numbers) + 1
+except ValueError:
+    # Starting from 0 here
+    new_filename_number = 0
+_LOGFILE = os.path.join(_LOGDIR, 'recount_log.{}.tsv.gz'.format(
+        new_filename_number
+    ))
+_LOGSTREAM = gzip.open(_LOGFILE, 'a')
+def close_log():
+    """ Closes log stream; for use on script exit.
+
+        No return value.
+    """
+    _LOGSTREAM.close()
+atexit.register(close_log)
 
 @app.route('/')
 def duffout():
@@ -35,6 +68,13 @@ def forward(resource, identifier):
 
         Return value: Flask redirect response object
     """
+    # Log all requests, even weird ones
+    print >>_LOGSTREAM, '\t'.join(
+        [time.strftime('%A, %b %d, %Y at %I:%M:%S %p %Z'),
+             str(mmh3.hash128(request.remote_addr)),
+             resource,
+             identifier])
+    _LOGSTREAM.flush()
     if resource == 'recount':
         # Redirect to IDIES URL first
         idies_url = '/'.join(['http://idies.jhu.edu/recount/data', identifier])
