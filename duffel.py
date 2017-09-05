@@ -13,14 +13,13 @@ import subprocess
 import json
 import requests
 import sys
-import md5
 import gzip
 import atexit
 import os
 import time
+import mmh3
 app = Flask(__name__)
 
-print 'hi'
 # Path to ACD CLI is hardcoded so app works on Webfaction
 _ACDCLI = '/home/verve/anaconda3/bin/acdcli'
 # For local tests
