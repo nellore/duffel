@@ -11,6 +11,7 @@ cd $HOME
 mkdir -p $HOME/lib/python2.7
 easy_install-2.7 flask
 easy_install-2.7 requests
+easy_install-2.7 mmh3
 rm -r $HOME/webapps/$APPNAME/htdocs
 mkdir $HOME/webapps/$APPNAME/$APPNAME
 touch $HOME/webapps/$APPNAME/$APPNAME/__init__.py

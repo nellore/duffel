@@ -20,6 +20,7 @@ import os
 import time
 app = Flask(__name__)
 
+print 'hi'
 # Path to ACD CLI is hardcoded so app works on Webfaction
 _ACDCLI = '/home/verve/anaconda3/bin/acdcli'
 # For local tests
