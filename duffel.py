@@ -27,7 +27,7 @@ _ACDCLI = '/home/verve/anaconda3/bin/acdcli'
 # Path to log file is hardcoded
 # DO NOT TRACK IPs/LOCATIONS; track only times
 # Always open new logfile when restarting
-_LOGDIR = '/home/verve'
+_LOGDIR = '/home/verve/recount_logs'
 filename_numbers = []
 for filename_number in [filename.split('.')[1] for filename
     in os.listdir(_LOGDIR) if 'recount_log' in filename]:
@@ -71,7 +71,7 @@ def forward(resource, identifier):
     # Log all requests, even weird ones
     print >>_LOGSTREAM, '\t'.join(
         [time.strftime('%A, %b %d, %Y at %I:%M:%S %p %Z'),
-             str(mmh3.hash128(request.remote_addr)),
+             str(mmh3.hash128(request.remote_addr + 'recountsalt')),
              resource,
              identifier])
     _LOGSTREAM.flush()
