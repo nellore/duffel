@@ -81,64 +81,20 @@ def forward(resource, identifier):
              identifier])
     _LOGSTREAM.flush()
     if resource == 'recount':
-        # Redirect to IDIES URL first
+        # Redirect to IDIES URL in order of descending version
+        for i in ['2']: # add versions to precede 2 as they are released
+            if identifier.startswith(' '.join(['v', i, '/'])):
+                idies_url = '/'.join(
+                            ['http://idies.jhu.edu/recount/data', identifier]
+                        )
+                idies_response = requests.head(idies_url)
+                if idies_response.status_code == 200:
+                    return redirect(idies_url, code=302)
+        # v1 is not explicitly versioned
         idies_url = '/'.join(['http://idies.jhu.edu/recount/data', identifier])
         idies_response = requests.head(idies_url)
         if idies_response.status_code == 200:
             return redirect(idies_url, code=302)
-        # IDIES won't work; try Cloud Drive
-        try:
-            templink = json.loads(
-                            subprocess.check_output(
-                                [
-                                    _ACDCLI,
-                                    'metadata',
-                                    '/'.join(['', resource, identifier])
-                            ]
-                        )
-                    )['tempLink']
-        except Exception as e:
-            # 404 out below
-            pass
-        else:
-            if request.method == 'HEAD':
-                # Workaround: use GET and simulate header
-                aws_response = requests.get(
-                        templink,
-                        headers={'range' : 'bytes=0-0'}
-                    )
-                headers_to_return = Headers(aws_response.headers.items())
-                content_length = headers_to_return.get(
-                                'content-range'
-                            ).rpartition('/')[-1]
-                headers_to_return.set('Content-Length', content_length)
-                try:
-                    content_range = request.headers['range'].replace(
-                                            '=', ' '
-                                        ).strip()
-                    if content_range.endswith('-'):
-                        content_range = ''.join(
-                                [content_range, content_length,
-                                    '/', content_length]
-                            )
-                    else:
-                        content_range = ''.join([content_range,
-                                                    '/', content_length])
-                    headers_to_return.set(
-                            'Content-Range',
-                            content_range
-                        )
-                    content_range_present = True
-                except KeyError:
-                    headers_to_return.remove('Content-Range')
-                    content_range_present = False
-                return Response(
-                        headers=headers_to_return,
-                        status=(206 if content_range_present
-                                    else 200),
-                        content_type=aws_response.headers['content-type']
-                    )
-            return redirect(templink, code=302)
     abort(404)
 
 if __name__ == '__main__':
